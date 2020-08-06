@@ -1,3 +1,14 @@
+
+
+
+# gap filling 
+source('codeProcessing/gapFill-with-RF.r')
+gapFill(snowTag = 'withSNOW', outGrdSizDeg = c(0.5,0.5), inputTrans = 'FOR %=>% CaG')
+
+
+
+
+
 gapFill <- function(snowTag = 'withSNOW', outGrdSizDeg = c(0.5,0.5),  inputTrans = 'FOR %=>% CaG'){
   
   require(raster)
@@ -11,27 +22,28 @@ gapFill <- function(snowTag = 'withSNOW', outGrdSizDeg = c(0.5,0.5),  inputTrans
   require(sf)
   require(here)
   
+  # load vectors... to be defined after... 
+  
   vpath <- '/ESS_Datasets/USERS/Duveiller/AncillaryDatasets/WorldVector/'
   
   wmap_df_land <- st_read(paste0(vpath,'ne_110m_land.shp'),quiet=T)
   wmap_df_ocean <- st_read(paste0(vpath,'ne_110m_ocean.shp'),quiet=T)
   
-  
+
   # load CLIM data
-  load('dataProcessing/climData/df4ClimateSpace_05dd.RData') # dfClim
+  load('data/inter_data/climData/df4ClimateSpace_05dd.RData') # dfClim
+  
+  source('data/input_data/___loadDataPaths___.R')  # dpath_s4t
+  
+  
   
   
   # load and prepare a mask for permanent snow/ice & sparse vegetation
-  dpath <- '/ESS_Datasets/USERS/Duveiller/Workspace/lulcc-bph_mrvtool/dataInput/'
-  LCfile <- paste0(dpath,'/CCI2IGBPgen/ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-1.000000Deg-2010-v2.0.7.nc')
-  
-  ### make Classwise masks
-  # set min thr 
+
   minTHR <- 0.05
   
-  LCfile2 <- paste0('/ESS_Datasets/USERS/Duveiller/Workspace/lulcc-bph_mrvtool/dataInput/',
-                    '/CCI2IGBPgen/ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-1.000000Deg-2010-v2.0.7.nc')
-  
+  LCfile2 <- paste0('data/input_data',
+                    '/ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-1.000000Deg-2010-v2.0.7.nc')
   
   msk_FOR <- disaggregate(raster(LCfile2,varname='FOR'), fact = 2) > minTHR
   msk_SHR <- disaggregate(raster(LCfile2,varname='SHR'), fact = 2) > minTHR
@@ -52,31 +64,36 @@ gapFill <- function(snowTag = 'withSNOW', outGrdSizDeg = c(0.5,0.5),  inputTrans
   
   
   
-  
+
   tpath <- 'dataProcessing/df/'
-  iVar <- 'Albedo'
-  
+  iVar <- 'albedo'
   print(paste('Working on',iVar))
+  month <- 1
+  type <- 'IGBPgen'
   
   #### Read ncdf and turn in into usable R dataframe ####
   
-  # read as raster to simplify
-  rs <- brick(x = paste0('dataProcessing/RawDeltaNC/',iVar,'_',snowTag,'.nc'), 
-              varname = paste0('Delta_',iVar))
+  rs <- brick(x = paste0(dpath_s4t, '/', iVar,'_',type,'.nc'), 
+              varname = paste0('Delta_',iVar),
+              level = month)
   
   # set a threshold on quality based on standard deviation within gridcell
   sd_thr <- 0.05
-  sd <- brick(x = paste0('dataProcessing/RawDeltaNC/',iVar,'_',snowTag,'.nc'), 
-              varname = paste0('SD_Delta_',iVar))
+  sd <- brick(x = paste0(dpath_s4t, '/', iVar,'_',type,'.nc'), 
+              varname = paste0('SD_Delta_',iVar),
+              level = month)
+  
   rs <- mask(x = rs, mask = sd > sd_thr, maskvalue = T, updatevalue = NA)
   
   # set a threshold on quality based on number of 0.05dd samples within gridcell
   nu_thr <- 5
-  nu <- brick(x = paste0('dataProcessing/RawDeltaNC/',iVar,'_',snowTag,'.nc'), 
-              varname = paste0('N_',iVar))  
+  nu <- brick(x = paste0(dpath_s4t, '/', iVar,'_',type,'.nc'), 
+              varname = paste0('N_Delta_',iVar),
+              level = month)  
   rs <- mask(x = rs, mask = nu < nu_thr, maskvalue = T, updatevalue = NA)
   
-  # pass the masekd raster into a long dataframe
+  
+  # pass the masked raster into a long dataframe
   df <- as.data.frame(x = rs, xy = T, long = T)
   colnames(df) <- c('Lon', 'Lat', 'Time', 'Delta_T') 
   
