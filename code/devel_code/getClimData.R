@@ -15,8 +15,6 @@ library(R.utils)
 library(here)
 
 
-
-
 #### Get input data #### ----
 
 # define years of interest
@@ -38,6 +36,9 @@ pre <- stack(pre.ncfile)
 tmp_sub <- tmp[[(12*(yrS - 1901)+1):(12*(yrE - 1901)+12)]]
 pre_sub <- pre[[(12*(yrS - 1901)+1):(12*(yrE - 1901)+12)]]
 
+# aggregate from 0.5dd to 1dd to match S4T data
+tmp_sub <- aggregate(tmp_sub, fact = 2)
+pre_sub <- aggregate(pre_sub, fact = 2)
 
 #### Calculate climatic indices #### ----
 
@@ -74,13 +75,13 @@ for(iT in 1:5){
 }
 
 # calculate raster medians and store all in a stack
-
 clim.5yr <- stack(
-  raster::calc(TMP_mean.yr,   fun = median,na.rm = T),
+  raster::calc(TMP_mean.yr,  fun = median, na.rm = T),
   raster::calc(TMP_range.yr, fun = median, na.rm = T),
   raster::calc(PPT_sum.yr,   fun = median, na.rm = T),
   raster::calc(AridIndex.yr, fun = median, na.rm = T),
   raster::calc(SNW_sum.yr,   fun = median, na.rm = T))
+
 
 # Convert to points in a data.frame
 dfClim <- as.data.frame(rasterToPoints(clim.5yr))
@@ -91,7 +92,7 @@ colnames(dfClim) <- c('Lon', 'Lat', 'TMP_mean', 'TMP_range', 'PPT_sum', 'AridInd
 out_dpath <- 'data/inter_data/climData'
 dir.create(path = out_dpath, showWarnings = F, recursive = T)
 
-save('dfClim', file = paste0(out_dpath,'/df4ClimateSpace_05dd.RData'))
+save('dfClim', file = paste0(out_dpath,'/df4ClimateSpace_1dd.RData'))
 
 # delete the uncompressed files
 file.remove(tmp.ncfile)
