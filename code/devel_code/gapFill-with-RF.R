@@ -70,6 +70,9 @@ df_msk <- bind_rows(
 df_msk$Mask[is.na(df_msk$Mask)] <- F  # because some had NAs due to msk sum
 
 
+nTrans <- length(unique(df_msk$Transition))
+
+
 # 
 
 
@@ -78,8 +81,8 @@ df_msk$Mask[is.na(df_msk$Mask)] <- F  # because some had NAs due to msk sum
 # function to gap-fill with RF for a given transition at a given time
 gapfill_layer <- function(df_dat, checkplot = T){
   
-  inputTrans <- unique(df_dat$Transition)
-  iMonth <- unique(month)
+  inputTrans <-  unique(df_dat$Transition)
+  iMonth <- unique(df_dat$month)
   nbins <- 25
   
   bin.TMP_mean  <- seq(floor(min(df_dat[,'TMP_mean'], na.rm=T)), 
@@ -213,35 +216,74 @@ gapfill_layer <- function(df_dat, checkplot = T){
 #### Wrap around a file #### ---- 
 
 iVar <- 'albedo' 
-
 type <- 'IGBPgen'
 
 nc_filename_in <- paste0(dpath_s4t, '/', iVar,'_',type,'.nc')
-file.copy(from = nc_filename_in, 
-          to = paste0('data/final_data/', iVar, '_', type, '_gapfilled.nc'))
-nc_out <- paste0('data/final_data/', iVar, '_', type, '_gapfilled.nc')
+nc_filename_out <- paste0('data/final_data/', iVar, '_', type, '_gapfilled.nc')
+
 nc <- nc_open(nc_filename_in)
 
 
 
-iMonth <- 12
-iTr <- 3
+# mk new nc
+dimX <- ncdim_def(name = 'lon',
+                  units = ncatt_get(nc, varid = 'lon', attname = 'units')$value, 
+                  vals = ncvar_get(nc, varid = 'lon'), unlim = F,
+                  longname = ncatt_get(nc, varid = 'lon', attname = 'long_name')$value)
+
+dimY <- ncdim_def(name = 'lat',
+                  units = ncatt_get(nc, varid = 'lat', attname = 'units')$value, 
+                  vals = ncvar_get(nc, varid = 'lat'), unlim = F,
+                  longname = ncatt_get(nc, varid = 'lat', attname = 'long_name')$value)
+
+dimM <- ncdim_def(name = 'mon',
+                  units = ncatt_get(nc, varid = 'mon', attname = 'units')$value, 
+                  vals = ncvar_get(nc, varid = 'mon'), unlim = F,
+                  longname = ncatt_get(nc, varid = 'mon', attname = 'long_name')$value)
+
+dimT <- ncdim_def(name = 'iTr',
+                  units = 'transition', 
+                  vals = ncvar_get(nc, varid = 'iTr'), unlim = F,
+                  longname = ncatt_get(nc, varid = 'iTr', attname = 'long_name')$value)
 
 
+
+new_var <- ncvar_def(name = paste0('Delta_',iVar), 
+                     dim = list(dimX, dimY, dimM, dimT), 
+                     units = '', missval = NA, compression = 7,
+                     longname = ncatt_get(nc, varid = paste0('Delta_',iVar), 
+                                          attname = 'long_name')$value)
+
+nc_new <- nc_create(filename = nc_filename_out,
+                    vars = new_var, force_v4 = T, verbose = F)
+
+nc_close(nc_new)
+
+
+
+
+nc_new <- nc_open(nc_filename_out, write = TRUE)
+
+iMonth <- 1
+iTrans <- 2
+
+for(iTrans in 2:nTrans){
+for(iMonth in 1:12){
+  
 # get the data 
 nc_dat <- ncvar_get(nc, varid = paste0('Delta_',iVar), 
-                    start = c(1,1, iMonth, iTr), count = c(-1, -1, 1, 1))
+                    start = c(1,1, iMonth, iTrans), count = c(-1, -1, 1, 1))
 
 
 # set a threshold on quality based on standard deviation within gridcell
 sd_thr <- 0.05
 sd_dat <- ncvar_get(nc, varid = paste0('SD_Delta_',iVar), 
-                    start = c(1,1, iMonth, iTr), count = c(-1, -1, 1, 1))
+                    start = c(1,1, iMonth, iTrans), count = c(-1, -1, 1, 1))
 
 # set a threshold on quality based on number of 0.05dd samples within gridcell
 nu_thr <- 5
 nu_dat <- ncvar_get(nc, varid = paste0('N_Delta_',iVar), 
-                    start = c(1,1, iMonth, iTr), count = c(-1, -1, 1, 1))
+                    start = c(1,1, iMonth, iTrans), count = c(-1, -1, 1, 1))
 
 nc_dat[sd_dat > sd_thr] <- NaN
 nc_dat[nu_dat < nu_thr] <- NaN
@@ -250,42 +292,36 @@ nc_dat[nu_dat < nu_thr] <- NaN
 df_dat <- dfClim %>% 
   mutate(delta = as.vector(nc_dat),
          month = iMonth) %>%
-  left_join(df_msk %>% filter(iTr == 1), by = c('Lon', 'Lat')) %>%
+  left_join(df_msk %>% filter(iTr == iTrans), by = c('Lon', 'Lat')) %>%
   filter(Mask == T)
 
-df_out <- gapfill_layer(df_dat)
+df_dum <- gapfill_layer(df_dat)
 
+df_out <- dfClim %>% select(Lon, Lat) %>% 
+  left_join(df_dum, by = c("Lon", "Lat"))
 
+ncvar_put(nc = nc_new, varid = paste0('Delta_',iVar), 
+          vals = df_out$delta,
+          start = c(1,1, iMonth, iTrans), count = c(-1, -1, 1, 1), verbose = F)
 
-
-
-
-
-
-# get back to NetCDF
-
-
-var1 <- ncvar_def(name = paste0('Delta_',varName), units = units, dim = list(dimX, dimY, dimT), missval = NA, 
-                  longname = paste('Difference in', vName,' for a given PFT transition'))
-
-nc <- nc_create(filename = paste0(opath, varName, '_', snowTag, '_spExt.nc'), vars = list(var1))
-
-for(iT in 1:12){
-  
-  df.RF.sub <- df.RF %>% filter(Time == iT) %>%
-    select('Lon', 'Lat', 'delta', 'delta_RF')
-  
-  r <- rasterize(x = select(df.RF.sub, c('Lon', 'Lat')), 
-                 y = raster(xmn = -180, xmx = 180, ymn = -90, ymx = 90, resolution = outGrdSizDeg),
-                 field = df.RF.sub$delta_RF)
-  
-  ncvar_put(nc = nc, varid = var1, vals = getValues(r), 
-            start = c(1,1,iT), count = c(-1,-1,1), verbose = FALSE) 
-  
-  
 }
+}
+
+nc_close(nc_new)
 
 nc_close(nc)
 
 print(paste('Finished with',iVar))
+
+
+
+
+
+
+
+
+
+
+
+
 
