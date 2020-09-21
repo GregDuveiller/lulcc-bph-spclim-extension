@@ -24,22 +24,16 @@ type <- 'IGBPdet' # 'IGBPgen'
 nu_thr <- 10
 minTHR <- 0.05
 
-fig.path <- paste0('data/inter_data/gapfilling_checkplots/', iVar, '_', type)
+ctrl.fig.path <- paste0('scratch/gapfilling_checkplots/', iVar, '_', type)
 
 #### load data #### ---- 
-source('data/input_data/___loadDataPaths___.R')  # dpath_s4t
 
-# load vectors... to be defined after... 
-vpath <- '../../AncillaryDatasets/WorldVector/'
-wmap_df_land <- st_read(paste0(vpath,'ne_50m_land.shp'), quiet = T)
-wmap_df_ocean <- st_read(paste0(vpath,'ne_50m_ocean.shp'), quiet = )
-
-
+# load vectors...
+wmap_df_land <- st_read('data/WorldVector/ne_50m_land.shp', quiet = T)
+wmap_df_ocean <- st_read('data/WorldVector/ne_50m_ocean.shp', quiet = T)
 
 # load CLIM data
-load('data/inter_data/climData/df4ClimateSpace_1dd.RData') # dfClim
-
-
+load('results/cleaned_input_data/climate/df4ClimateSpace_1dd.RData') # dfClim
 
 
 
@@ -47,7 +41,7 @@ load('data/inter_data/climData/df4ClimateSpace_1dd.RData') # dfClim
 
 if(type == 'IGBPgen'){
 
-  LCfile <- paste0('data/input_data', '/CCI2', type,
+  LCfile <- paste0('results/cleaned_input_data/land_cover', '/CCI2', type,
                    '/ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-1.000000Deg-2010-v2.0.7.nc')
   
   
@@ -82,7 +76,7 @@ nTrans <- length(unique(df_msk$Transition))
 
 if(type == 'IGBPdet'){
   
-  LCfile <- paste0('data/input_data', '/CCI2', type,
+  LCfile <- paste0('results/cleaned_input_data/land_cover', '/CCI2', type,
                    '/ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-1.000000Deg-2010-v2.0.7.nc')
   
 
@@ -116,10 +110,10 @@ df_msk$Mask[is.na(df_msk$Mask)] <- F  # because some had NAs due to msk sum
 nTrans <- length(unique(df_msk$Transition))
 }
 
-#### Define function to gap-fill a single layer #### ---- 
+#### Define function to spatially extend a single layer #### ---- 
 
-# function to gap-fill with RF for a given transition at a given time
-gapfill_layer <- function(df_dat, checkplot = T){
+# function to spatially extend with RF for a given transition at a given time
+spextend_layer <- function(df_dat, checkplot = T){
   
   inputTrans <-  unique(df_dat$Transition)
   iMonth <- unique(df_dat$month)
@@ -186,7 +180,7 @@ gapfill_layer <- function(df_dat, checkplot = T){
     require(scales)
     
     monthTag <- ifelse(iMonth < 10, 
-                       paste0('0',as.character(iMonth)), 
+                       paste0('0', as.character(iMonth)), 
                        as.character(iMonth))
     
     sqshlims <- max(abs(quantile(df_dat$delta, probs = c(0.05, 0.95), na.rm = T))) * c(-1,1)
@@ -196,10 +190,10 @@ gapfill_layer <- function(df_dat, checkplot = T){
       geom_sf(data = wmap_df_land, fill='Grey50',colour='Grey50',size=0)+
       geom_raster(aes(x=Lon, y=Lat,fill=DeltaT))+
       geom_sf(data = wmap_df_ocean, fill='Grey20',colour='Grey20',size=0)+
-      facet_wrap(~Source, nc=1)+
+      facet_wrap(~Source, nc = 1)+
       scale_fill_gradientn(paste('Change in',iVar), colors = rev(brewer.pal(8,'RdBu')),
                            limits = sqshlims, oob = squish) +
-      coord_sf(ylim = c(-58,84), expand=F)+
+      coord_sf(ylim = c(-58,84), expand = F)+
       theme(panel.background=element_rect(fill='grey60'),
             panel.grid = element_blank(),
             legend.position = 'bottom',
@@ -213,7 +207,7 @@ gapfill_layer <- function(df_dat, checkplot = T){
     
     gsc0 <- ggplot(df_dat)+
       geom_point(aes(x = delta, y = delta_RF0), alpha = 0.1,
-                 colour='cornflowerblue')+
+                 colour = 'cornflowerblue')+
       geom_abline()+
       coord_equal(xlim = fulllims, ylim = fulllims)+
       ggtitle(paste('Before bias corr. | RMSE =', 
@@ -231,9 +225,9 @@ gapfill_layer <- function(df_dat, checkplot = T){
     ## Printing the entire figure ----
     fig.name <-  paste(type, iVar, gsub(' %=>% ','2', inputTrans), monthTag ,'checkplot', sep = '_')
     fig.width <- 10; fig.height <- 8; fig.fmt <- 'png'
-    fig.fullfname <- paste0(fig.path, '/', fig.name, '.', fig.fmt)
+    fig.fullfname <- paste0(ctrl.fig.path, '/', fig.name, '.', fig.fmt)
     
-    dir.create(fig.path, showWarnings = F, recursive = T)
+    dir.create(ctrl.fig.path, showWarnings = F, recursive = T)
     
     if(fig.fmt == 'png'){png(fig.fullfname, width = fig.width, height = fig.height, units = "in", res= 150)}
     if(fig.fmt == 'pdf'){pdf(fig.fullfname, width = fig.width, height = fig.height)}
@@ -255,8 +249,8 @@ gapfill_layer <- function(df_dat, checkplot = T){
 
 #### Prepare run for a given NCDF file #### ---- 
 
-nc_filename_in <- paste0(dpath_s4t, '/', iVar,'_',type,'.nc')
-nc_filename_out <- paste0('data/final_data/', iVar, '_', type, '_gf.nc')
+nc_filename_in <- paste0('data/bph-lulcc___S4Tdata/', iVar,'_',type,'.nc')
+nc_filename_out <- paste0('results/final_products/', iVar, '_', type, '_ext.nc')
 
 nc <- nc_open(nc_filename_in)
 print(paste('Starting with', iVar, 'in', type, 'classification...'))
@@ -376,8 +370,8 @@ for(iTrans in 1:nTrans){
       left_join(df_msk %>% filter(iTr == iTrans), by = c('Lon', 'Lat')) %>%
       filter(Mask == T)
     
-    # gap-fill where possible
-    df_dum <- gapfill_layer(df_dat)
+    # spatially extend/gap-fill where possible
+    df_dum <- spextend_layer(df_dat)
     
     # fill extra points with no data
     df_out <- dfClim %>% select(Lon, Lat) %>% 
@@ -385,7 +379,7 @@ for(iTrans in 1:nTrans){
     
     # put the new variable inside the new NetCDF
     ncvar_put(nc = nc_new, 
-              varid = paste0('Delta_', iVar, '_gapfilled'), 
+              varid = paste0('Delta_', iVar, '_ext'), 
               vals = df_out$delta,
               start = c(1,1, iMonth, iTrans), count = c(-1, -1, 1, 1))
     
