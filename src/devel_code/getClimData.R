@@ -1,6 +1,6 @@
 # getClimData.R
 #
-# script to harvest the necessary climate data and store it into an approapriate
+# script to harvest the necessary climate data and store it into an appropriate
 # data.frame for ingestion in the gap-filling function
 # 
 # G. Duveiller
