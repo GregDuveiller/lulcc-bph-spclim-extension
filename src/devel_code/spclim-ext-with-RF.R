@@ -18,13 +18,13 @@ require(here)
 #### Initialisation #### ---- 
 
 
-iVar <- 'albedo'  # 'LSTday'  #  'albedo' #
-type <- 'IGBPdet' # 'IGBPgen'
+iVar <- 'LSTday'  # 'LSTday'  #  'albedo' #
+type <- 'IGBPgen' # 'IGBPdet' # 'IGBPgen'
 
 nu_thr <- 10
 minTHR <- 0.05
 
-ctrl.fig.path <- paste0('scratch/gapfilling_checkplots/', iVar, '_', type)
+ctrl.fig.path <- paste0('scratch/gapfilling_checkplots_v2/', iVar, '_', type)
 
 #### load data #### ---- 
 
@@ -160,11 +160,12 @@ spextend_layer <- function(df_dat, checkplot = T){
   
   # set seed
   set.seed(1982)
+  fltr.data <- filter(df_dat, is.na(delta) == F)
   
   # Make estimation of Delta_AST based on climate space
   #  fitRF <- randomForest(delta ~ TMPmean + TMPrange + PPTsum + AIndex, data=filter(df_dat,is.na(delta)==F))
   fitRF <- randomForest(delta ~ TMP_mean + TMP_range + PPT_sum + SNW_sum + AridIndex, 
-                        data = filter(df_dat, is.na(delta) == F))
+                        data = fltr.data, ntree = 500, mtry = 3)
   df_dat$delta_RF0 <- predict(fitRF,df_dat)
   
   # correct the bias on the residues (RF appears to underestimate extremes)
@@ -284,7 +285,7 @@ dimT <- ncdim_def(name = 'iTr',
 var_longname <- ncatt_get(nc, varid = paste0('Delta_', iVar), 
                           attname = 'long_name')$value
 
-new_var_GFD <- ncvar_def(name = paste0('Delta_', iVar, '_gapfilled'), 
+new_var_GFD <- ncvar_def(name = paste0('Delta_', iVar, '_ext'), 
                          dim = list(dimX, dimY, dimM, dimT), 
                          units = '', 
                          missval = mzVal, compression = comprLevel,
