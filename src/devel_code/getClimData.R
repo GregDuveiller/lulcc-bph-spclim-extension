@@ -20,12 +20,10 @@ library(here)
 yrS <- 2008 
 yrE <- 2012 
 
-# get the input_data path
-source('data/input_data/___loadDataPaths___.R')    # dpath_cru
 
 # decompress file
-tmp.ncfile <- gunzip(paste0(dpath_cru,'/cru_ts4.04.1901.2019.tmp.dat.nc.gz'), remove = F)
-pre.ncfile <- gunzip(paste0(dpath_cru,'/cru_ts4.04.1901.2019.pre.dat.nc.gz'), remove = F)
+tmp.ncfile <- gunzip('data/CRU/cru_ts4.04.1901.2019.tmp.dat.nc.gz', remove = F)
+pre.ncfile <- gunzip('data/cru_ts4.04.1901.2019.pre.dat.nc.gz', remove = F)
 
 # make a raster stack
 tmp <- stack(tmp.ncfile)
@@ -88,7 +86,7 @@ colnames(dfClim) <- c('Lon', 'Lat', 'TMP_mean', 'TMP_range', 'PPT_sum', 'AridInd
 
 #### Export and clean-up #### ----
 
-out_dpath <- 'data/inter_data/climData'
+out_dpath <- 'results/cleaned_input_data/climate'
 dir.create(path = out_dpath, showWarnings = F, recursive = T)
 
 save('dfClim', file = paste0(out_dpath,'/df4ClimateSpace_1dd.RData'))
