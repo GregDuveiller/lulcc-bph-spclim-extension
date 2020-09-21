@@ -14,7 +14,6 @@ library(ncdf4)
 library(R.utils)
 library(here)
 
-
 #### Get input data #### ----
 
 # define years of interest
