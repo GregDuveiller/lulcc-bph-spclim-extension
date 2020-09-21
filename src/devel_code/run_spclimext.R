@@ -4,8 +4,8 @@ require(here)
 
 #### Initialisation #### ---- 
 
-iVar <- 'albedo'    # 'LSTnight'  # 'LSTday'  #  
-type <- 'IGBPgen'   # 'IGBPdet'   # 'IGBPgen'
+iVar <- 'LSTday'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
+type <- 'IGBPdet'   # 'IGBPdet'   # 'IGBPgen'
 
 ## Opt parameters... (set as default)
 # nu_thr <- 10

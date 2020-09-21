@@ -155,7 +155,10 @@ spclimext_withRF <- function(dfClim, iVar, type, nu_thr = 10, minTHR = 0.05,
   
   
   
-  # create new nc
+  # ensure target file does not yet exist
+  file.remove(nc_filename_out)
+
+  # create new nc (and thus overwrite)
   nc_new <- nc_create(filename = nc_filename_out,
                       vars = list(new_var_GFD, new_var_delta, new_var_sd, new_var_n), 
                       force_v4 = T, verbose = F)

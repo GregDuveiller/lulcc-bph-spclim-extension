@@ -4,7 +4,7 @@ make_checkplot <- function(df_dat, iMonth, ctrl.fig.path){
   require(grid)
   require(scales)
   require(sf)
-  
+  require(RColorBrewer)
   
   # load vectors... (for coasts on figures)
   wmap_df_land <- st_read('data/WorldVector/ne_50m_land.shp', quiet = T)
@@ -23,7 +23,7 @@ make_checkplot <- function(df_dat, iMonth, ctrl.fig.path){
   gmap <- ggplot(gather(df_dat, key = Source, value = DeltaT, 
                         c('delta','delta_RF0','delta_RF1')))+
     geom_sf(data = wmap_df_land, fill='Grey50',colour='Grey50',size=0)+
-    geom_raster(aes(x=Lon, y=Lat,fill=DeltaT))+
+    geom_raster(aes(x = Lon, y = Lat, fill = DeltaT))+
     geom_sf(data = wmap_df_ocean, fill='Grey20',colour='Grey20',size=0)+
     facet_wrap(~Source, nc = 1)+
     scale_fill_gradientn(paste('Change in',iVar), colors = rev(brewer.pal(8,'RdBu')),
