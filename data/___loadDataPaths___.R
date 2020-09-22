@@ -14,6 +14,9 @@ if(sys['nodename'] == "jeodpp-terminal-151p-02" &
 
 # CRU data
 dpath_cru <- paste0(main_data_path, '/external_datasets/climate/CRU')
+file.symlink('data/CRU/', dpath_cru)
 
 # S4T original data (v1) before gap-filling spatial extension
 dpath_s4t <-  paste0(main_data_path, '/internal_datasets/bph-lulcc___S4Tdata')
+file.symlink('data/bph-lulcc___S4Tdata/', dpath_s4t)
+

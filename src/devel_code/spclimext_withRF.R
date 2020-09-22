@@ -26,15 +26,15 @@ spclimext_withRF <- function(dfClim, iVar, type, nu_thr = 10, minTHR = 0.05,
       as.data.frame(msk_FOR | msk_SHR, xy = T) %>% 
         mutate(Transition = 'FOR %=>% SHR', iTr = 1),
       as.data.frame(msk_FOR | msk_CaG, xy = T) %>%
-        mutate(Transition ='FOR %=>% CaG', iTr = 2),
-      as.data.frame(msk_FOR|msk_SAV, xy=T) %>%
-        mutate(Transition='FOR %=>% SAV', iTr = 3),
-      as.data.frame(msk_SHR|msk_CaG, xy=T) %>%
-        mutate(Transition='SHR %=>% CaG', iTr = 4),
-      as.data.frame(msk_SHR|msk_SAV, xy=T) %>%
-        mutate(Transition='SHR %=>% SAV', iTr = 5),
-      as.data.frame(msk_CaG|msk_SAV, xy=T) %>% 
-        mutate(Transition='CaG %=>% SAV', iTr = 6)
+        mutate(Transition = 'FOR %=>% CaG', iTr = 2),
+      as.data.frame(msk_FOR | msk_SAV, xy = T) %>%
+        mutate(Transition = 'FOR %=>% SAV', iTr = 3),
+      as.data.frame(msk_SHR | msk_CaG, xy = T) %>%
+        mutate(Transition = 'SHR %=>% CaG', iTr = 4),
+      as.data.frame(msk_SHR | msk_SAV, xy = T) %>%
+        mutate(Transition = 'SHR %=>% SAV', iTr = 5),
+      as.data.frame(msk_CaG | msk_SAV, xy = T) %>% 
+        mutate(Transition = 'CaG %=>% SAV', iTr = 6)
     ) %>%
       rename(Lon = x, Lat = y, Mask = layer)
     

@@ -4,8 +4,12 @@ require(here)
 
 #### Initialisation #### ---- 
 
-iVar <- 'LSTnight'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
-type <- 'IGBPdet'   # 'IGBPdet'   # 'IGBPgen'
+iVar <- 'SWreflected' # 'HG'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
+type <- 'IGBPgen'   # 'IGBPdet'   # 'IGBPgen'
+chkp <- F
+
+# set symlinks to connect to the data... 
+source('data/___loadDataPaths___.R')
 
 ## Opt parameters... (set as default)
 # nu_thr <- 10
@@ -21,4 +25,4 @@ load('results/cleaned_input_data/climate/df4ClimateSpace_1dd.RData') # dfClim
 
 #### run #### ---- 
 source('src/devel_code/spclimext_withRF.R')
-spclimext_withRF(dfClim, iVar, type, do_checkplot = T)
+spclimext_withRF(dfClim, iVar, type, do_checkplot = chkp)
