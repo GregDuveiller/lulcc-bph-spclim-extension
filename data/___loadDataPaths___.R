@@ -6,6 +6,12 @@ if(sys['nodename'] == "Gregorys-MBP.fritz.box" &
   main_data_path <- '/Volumes/home/work/data'
 }
 
+if(sys['nodename'] == "jeodpp-terminal-151p-02" & 
+   sys['user'] == 'duveigr'){ # if it's me, at home, likely the data is on a NAS
+  main_data_path <- '/storage/duveigr/data'
+}
+
+
 # CRU data
 dpath_cru <- paste0(main_data_path, '/external_datasets/climate/CRU')
 
