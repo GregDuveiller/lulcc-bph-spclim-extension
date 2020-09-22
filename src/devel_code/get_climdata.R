@@ -23,7 +23,7 @@ yrE <- 2012
 
 # decompress file
 tmp.ncfile <- gunzip('data/CRU/cru_ts4.04.1901.2019.tmp.dat.nc.gz', remove = F)
-pre.ncfile <- gunzip('data/cru_ts4.04.1901.2019.pre.dat.nc.gz', remove = F)
+pre.ncfile <- gunzip('data/CRU/cru_ts4.04.1901.2019.pre.dat.nc.gz', remove = F)
 
 # make a raster stack
 tmp <- stack(tmp.ncfile)

@@ -4,13 +4,15 @@ require(here)
 
 #### Initialisation #### ---- 
 
-iVar <- 'SWreflected' # 'HG'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
-type <- 'IGBPgen'   # 'IGBPdet'   # 'IGBPgen'
+iVar <- 'LWsfc' # 'HG'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
+type <- 'IGBPdet'   # 'IGBPdet'   # 'IGBPgen'
 chkp <- F
 
 # set symlinks to connect to the data... 
-source('data/___loadDataPaths___.R')
+# source('data/___loadDataPaths___.R')
 
+dir.create('scratch')
+dir.create('results/final_products', recursive = T)
 ## Opt parameters... (set as default)
 # nu_thr <- 10
 # minTHR <- 0.05
