@@ -4,7 +4,7 @@ require(here)
 
 #### Initialisation #### ---- 
 
-iVar <- 'LSTday'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
+iVar <- 'LSTnight'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
 type <- 'IGBPdet'   # 'IGBPdet'   # 'IGBPgen'
 
 ## Opt parameters... (set as default)
