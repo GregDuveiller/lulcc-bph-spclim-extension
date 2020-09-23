@@ -10,6 +10,7 @@ if(sys['nodename'] == "Gregorys-MBP.fritz.box" &
   
   spath_s4t <- '/Volumes/home/work/data/internal_datasets/bph-lulcc___S4Tdata/'
   spath_cru <- '/Volumes/home/work/data/external_datasets/climate/CRU/'
+  spath_vct <- '/Volumes/home/work/data/external_datasets/WorldVector/'
   
 }
 
@@ -18,7 +19,7 @@ if(sys['nodename'] == "jeodpp-terminal-151p-02" &
 
   spath_s4t <- '/storage/duveigr/internal_datasets/bph-lulcc___S4Tdata/v1.0/'
   spath_cru <- '/storage/duveigr/external_datasets/climate/CRU/'
-  
+  spath_vct <- '/storage/duveigr/external_datasets/WorldVector/'
 }
 
 # prepare symlinks to data on the local setup
@@ -43,10 +44,19 @@ if(file.exists(tpath_cru)){
   file.symlink(from = spath_cru, to = tpath_cru)
 }
 
-
+tpath_vct <- 'data/WorldVector'
+if(file.exists(tpath_vct)){
+  if(Sys.readlink(tpath_vct) != spath_vct){
+    file.remove(tpath_vct)
+    file.symlink(from = spath_vct, to = tpath_vct)
+  }
+} else {
+  file.symlink(from = spath_vct, to = tpath_vct)
+}
 
 #### prepare run ----
 dir.create('scratch')
+dir.create('data')
 dir.create('results/final_products', recursive = T)
 
 calc_climData <- FALSE
