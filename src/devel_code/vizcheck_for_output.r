@@ -42,7 +42,7 @@ vizchech_for_output <- function(iVar, type, iMon, iTrn, path){
     facet_wrap(~Source, nc = 1)+
     scale_fill_gradientn('', colors = rev(brewer.pal(8,'RdBu')),
                          limits = sqshlims, oob = squish) +
-    coord_sf(ylim = c(-58,84), expand = F)+
+    coord_sf(ylim = c(-58,84), xlim = c(-180, 180), expand = F)+
     theme(panel.background = element_rect(fill='grey60'),
           panel.grid = element_blank(),
           legend.position = 'right',
