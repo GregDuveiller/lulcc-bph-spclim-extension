@@ -49,21 +49,19 @@ if(file.exists(tpath_cru)){
 dir.create('scratch')
 dir.create('results/final_products', recursive = T)
 
-
-
+calc_climData <- FALSE
 
 #### get clim data #### ---- 
 
-# if(calc_climData){source()}
+if(calc_climData){source('src/devel_code/get_climdata.R')}
 
 # load CLIM data
 load('results/cleaned_input_data/climate/df4ClimateSpace_1dd.RData') # dfClim
 
 #### run #### ---- 
 source('src/devel_code/spclimext_withRF.R')
-spclimext_withRF(dfClim, iVar = 'LWemitted',   type = 'IGBPgen', do_checkplot = F)
-spclimext_withRF(dfClim, iVar = 'LWsfc',       type = 'IGBPgen', do_checkplot = F)
-spclimext_withRF(dfClim, iVar = 'LE',          type = 'IGBPgen', do_checkplot = F)
+spclimext_withRF(dfClim, iVar = 'HG', type = 'IGBPgen', do_checkplot = F)
+spclimext_withRF(dfClim, iVar = 'LE', type = 'IGBPgen', do_checkplot = F)
 
 ## Opt parameters... (set as default)
 # nu_thr <- 10
