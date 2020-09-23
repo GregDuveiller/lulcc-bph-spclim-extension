@@ -15,7 +15,7 @@ if(sys['nodename'] == "Gregorys-MBP.fritz.box" &
 
 if(sys['nodename'] == "jeodpp-terminal-151p-02" & 
    sys['user'] == 'duveigr'){ # if it's me, on JEODPP
-  
+
   spath_s4t <- '/storage/duveigr/internal_datasets/bph-lulcc___S4Tdata/v1.0/'
   spath_cru <- '/storage/duveigr/external_datasets/climate/CRU/'
   
