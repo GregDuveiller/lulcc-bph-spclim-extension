@@ -4,7 +4,7 @@ require(here)
 
 #### Initialisation #### ---- 
 
-iVar <- 'LWsfc' # 'HG'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
+iVar <- 'SWreflected' # 'HG'  # 'albedo'    # 'LSTnight'  # 'LSTday'  
 type <- 'IGBPdet'   # 'IGBPdet'   # 'IGBPgen'
 chkp <- F
 
@@ -20,6 +20,7 @@ dir.create('results/final_products', recursive = T)
 # mzVal <- NA
 
 
+
 #### load data #### ---- 
 
 # load CLIM data
@@ -27,4 +28,5 @@ load('results/cleaned_input_data/climate/df4ClimateSpace_1dd.RData') # dfClim
 
 #### run #### ---- 
 source('src/devel_code/spclimext_withRF.R')
-spclimext_withRF(dfClim, iVar, type, do_checkplot = chkp)
+spclimext_withRF(dfClim, 'SWreflected', type, do_checkplot = chkp)
+#spclimext_withRF(dfClim, 'albedo', type, do_checkplot = chkp)
