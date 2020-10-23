@@ -79,7 +79,7 @@ spclimext_withRF <- function(dfClim, iVar, type, nu_thr = 10, minTHR = 0.05,
   }
   
   #### Define function to spatially extend a single layer #### ---- 
-  source('src/devel_code/spextend_layer.R')
+  source('code/spextend_layer.R')
   
   #### Prepare run for a given NCDF file #### ---- 
   

@@ -1,8 +1,8 @@
-# Script to run an spclim job 
+# Script saying where the input data originally are and setting symbolic links
+# 
+# NOTE: Still unsure if this is the best way, as there is no reason to set this 
+#       info in a public repo
 
-require(here)
-
-#### setup run #### ---- 
 
 sys <- Sys.info()
 if(sys['nodename'] == "Gregorys-MBP.fritz.box" & 
@@ -16,7 +16,7 @@ if(sys['nodename'] == "Gregorys-MBP.fritz.box" &
 
 if(sys['nodename'] == "jeodpp-terminal-151p-02" & 
    sys['user'] == 'duveigr'){ # if it's me, on JEODPP
-
+  
   spath_s4t <- '/storage/duveigr/internal_datasets/bph-lulcc___S4Tdata/v1.0/'
   spath_cru <- '/storage/duveigr/external_datasets/climate/CRU/'
   spath_vct <- '/storage/duveigr/external_datasets/WorldVector/'
@@ -53,28 +53,3 @@ if(file.exists(tpath_vct)){
 } else {
   file.symlink(from = spath_vct, to = tpath_vct)
 }
-
-#### prepare run ----
-dir.create('scratch')
-dir.create('data')
-dir.create('results/final_products', recursive = T)
-
-calc_climData <- FALSE
-
-#### get clim data #### ---- 
-
-if(calc_climData){source('src/devel_code/get_climdata.R')}
-
-# load CLIM data
-load('results/cleaned_input_data/climate/df4ClimateSpace_1dd.RData') # dfClim
-
-#### run #### ---- 
-source('src/devel_code/spclimext_withRF.R')
-spclimext_withRF(dfClim, iVar = 'HG', type = 'IGBPgen', do_checkplot = F)
-spclimext_withRF(dfClim, iVar = 'LE', type = 'IGBPgen', do_checkplot = F)
-
-## Opt parameters... (set as default)
-# nu_thr <- 10
-# minTHR <- 0.05
-# comprLevel <- 7
-# mzVal <- NA
