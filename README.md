@@ -44,4 +44,4 @@ https://data.jrc.ec.europa.eu/dataset/f97e4216-e81c-4dfb-b42d-d0c19070d029
 The updated (v2.0) data have the same format as before, but now contains an extra variable with an *_ext* suffix, which is the spatially extended version. The original data (without the *_ext* suffix) are also available in each file. Note that over the same location both will differ as the extended version is in effect performing a smoothing operation due to the climate-based interpolation. Finally, the file sizes have been substantially reduced by using the internal compression within the netCDF files.
 
 ## Versioning
-This repository is available on GitHub at https://github.com/GregDuveiller/lulcc-bph-spclim-extension/. All versions of this repository, including the last release, are archived on Zenodo: [DOI: 10.xxxx/zenodo.xxxxxxx].
+This repository is available on GitHub at https://github.com/GregDuveiller/lulcc-bph-spclim-extension/. All versions of this repository, including the last release, are archived on Zenodo: [DOI: 10.5281/zenodo.4293904].
