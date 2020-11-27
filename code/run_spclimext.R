@@ -30,9 +30,4 @@ for(iVar in iVars){
   }
 }
 
-## For info, opt parameters... 
-## (set as default)
-# nu_thr <- 10
-# minTHR <- 0.05
-# comprLevel <- 7
-# mzVal <- NA
+

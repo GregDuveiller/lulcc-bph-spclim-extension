@@ -1,13 +1,11 @@
 spclimext_withRF <- function(dfClim, iVar, type, nu_thr = 10, minTHR = 0.05, 
                              comprLevel = 7, mzVal = NA, do_checkplot = T){
   
-  
   require(raster)
   require(ncdf4)
   require(randomForest)
   require(dplyr)
   require(tidyr)
-  
   
   
   #### Prepare masking to define extent #### ---- 
